@@ -8,6 +8,8 @@ import torch
 import torchvision.ops
 from torch import nn
 
+from mmcv.ops import modulated_deform_conv2d
+
 class DeformableConv2d(nn.Module):
     def __init__(self,
                  in_channels,
@@ -56,12 +58,12 @@ class DeformableConv2d(nn.Module):
         offset = self.offset_conv(x).clamp(-max_offset, max_offset)
         modulator = 2. * torch.sigmoid(self.modulator_conv(x))
         
-        x = torchvision.ops.deform_conv2d(input=x, 
-                                          offset=offset, 
-                                          weight=self.regular_conv.weight, 
-                                          bias=self.regular_conv.bias,
-                                          stride=self.stride,
-                                          padding=self.padding,
-                                          mask=modulator
-                                          )
+        x = modulated_deform_conv2d(x, 
+                          offset, 
+                          modulator,
+                          self.regular_conv.weight, 
+                          self.regular_conv.bias,
+                          self.stride,
+                          self.padding,
+                          )
         return x
