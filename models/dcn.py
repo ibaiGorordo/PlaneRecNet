@@ -65,5 +65,7 @@ class DeformableConv2d(nn.Module):
                           self.regular_conv.bias,
                           self.stride,
                           self.padding,
-                          )
+                          1,
+                          1,
+                          1)
         return x
